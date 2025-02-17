@@ -1,0 +1,21 @@
+{
+    "name": "hexlet/code",
+    "description": "Project-48",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Hexlet\\Code\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "pavel",
+            "email": "voroshilow_pavel@mail.ru"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "docopt/docopt": "^1.0"
+    }
+}
