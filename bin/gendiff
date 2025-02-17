@@ -9,9 +9,12 @@ if (file_exists($autoloadPath1)) {
 } else {
     require_once $autoloadPath2;
 }
-//use Docopt\Handler;
-use Hexlet\Code\Cli;
-
-
-$cli = new Cli($argv);
-$cli->runProgram();
+ use Hexlet\Code\Cli;
+ $cli = new Cli($argv);
+ try {
+    $cli->runProgram();
+ } catch (Exception $e) {
+       echo 'PHP перехватил исключение: ',  $e->getMessage(), "\n";
+  } finally {
+        echo "\nРабота программы заверешена.\n";
+   }
