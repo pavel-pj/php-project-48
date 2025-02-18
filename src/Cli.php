@@ -5,7 +5,6 @@ namespace Hexlet\Code;
 use Docopt;
 use Mockery\Exception;
 
-
 class Cli
 {
     public $params;
@@ -38,7 +37,9 @@ class Cli
         $filesData[] =  $this->parsing($filesPath[0]);
         $filesData[] =  $this->parsing($filesPath[1]);
 
-        print_r($filesData);
+
+        $diff = $this->genDiff($filesData[0],$filesData[1]);
+        echo $diff;
 
 
     }
@@ -80,11 +81,55 @@ DOCOPT;
             exit;
         }
 
-
         return json_decode($content,true);
 
     }
 
 
+    public function genDiff (array $file1, array $file2) {
+
+        ksort($file1);
+        ksort($file2);
+
+        $result = [];
+        foreach ($file1 as $key=>$value) {
+
+            //одинаковы
+            if (array_key_exists($key,$file2) and $file2[$key]===$value) {
+
+                $result [$key] =[$key =>$value];
+               }
+            else if(array_key_exists($key,$file2)){
+                $result [$key] = [
+                    '- '.$key => $value,
+                    '+ '.$key => $file2[$key]
+
+                ];
+            }
+            else {
+                $result [$key] = ['- '.$key => $value];
+            }
+        }
+
+       foreach ($file2 as $key=>$value){
+           if (!array_key_exists($key, $file1)){
+               $result [$key] = ['+ '.$key =>$value];
+           }
+       }
+
+       ksort($result);
+
+       //flat
+       $result2 = [];
+       foreach($result as $item){
+           foreach ($item as $key=>$value) {
+               $result2 [$key] = $value;
+           }
+       }
+
+
+       return json_encode($result2);
+
+    }
 
 }

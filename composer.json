@@ -16,6 +16,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "docopt/docopt": "^1.0"
+        "docopt/docopt": "^1.0",
+        "illuminate/collections": "^10.48"
     }
 }
