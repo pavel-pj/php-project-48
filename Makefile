@@ -1,9 +1,5 @@
 install:
 	composer install
-install-linter:
-	composer global require "squizlabs/php_codesniffer=*"
-install-linter2:
-	curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
 validate:
 	composer validate
 up-ul:
@@ -14,6 +10,10 @@ lint:
 	composer exec --verbose phpcs -- --standard=PSR12 src
 lint-test:
 	composer exec --verbose phpcs -- --standard=PSR12 tests
+lint-action:
+	phpcs --standard=PSR12 src
+lint-test-action:
+	phpcs --standard=PSR12 tests
 gendiff:
 	./bin/gendiff
 test:

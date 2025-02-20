@@ -14,9 +14,7 @@ jobs:
       # run – произвольная bash-команда
       # ls -la выведет содержимое текущего репозитория
       - run: make install
-      - run: make install-linter
-      - run: make install-linter2
       - run: make test
-      - run: make lint
-      - run: make lint-test
+      - run: make lint-action
+      - run: make lint-test-action
 

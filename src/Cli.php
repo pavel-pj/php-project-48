@@ -114,7 +114,7 @@ DOCOPT;
         ksort($result);
 
        //flat
-        $result2 = [];
+        $result2 = [ ];
         foreach ($result as $item) {
             foreach ($item as $key => $value) {
                 $result2 [$key] = $value;
