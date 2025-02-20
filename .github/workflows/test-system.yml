@@ -16,6 +16,6 @@ jobs:
       - run: make install
       - run: make install-linter
       - run: make test
-      - run: make linter
-      - run: make linter-test
+      - run: make lint
+      - run: make lint-test
 
