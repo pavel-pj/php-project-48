@@ -18,5 +18,8 @@
     "require": {
         "docopt/docopt": "^1.0",
         "illuminate/collections": "^10.48"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10"
     }
 }
