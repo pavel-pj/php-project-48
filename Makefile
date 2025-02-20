@@ -1,3 +1,5 @@
+install:
+	composer install
 validate:
 	composer validate
 up-ul:
