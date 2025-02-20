@@ -11,9 +11,9 @@ lint:
 lint-test:
 	composer exec --verbose phpcs -- --standard=PSR12 tests
 lint-action:
-	phpcs --standard=PSR12 src
+	phpcs --standard=PSR12 /src
 lint-test-action:
-	phpcs --standard=PSR12 tests
+	phpcs --standard=PSR12 /tests
 gendiff:
 	./bin/gendiff
 test:
