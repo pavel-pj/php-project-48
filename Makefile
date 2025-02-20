@@ -2,6 +2,8 @@ install:
 	composer install
 install-linter:
 	composer global require "squizlabs/php_codesniffer=*"
+install-linter2:
+	curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
 validate:
 	composer validate
 up-ul:
