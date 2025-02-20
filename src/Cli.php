@@ -9,13 +9,13 @@ class Cli
 {
     public $params;
 
-    public function __construct(array|null $params = [] )
+    public function __construct(array|null $params = [])
     {
         $this->params = array_values($params);
     }
 
-    static public function cli($params){
-
+    public static function cli($params)
+    {
         unset($params[0]);
         return new self($params);
     }
@@ -67,7 +67,7 @@ DOCOPT;
         }
     }
 
-    public function parsing(string $filePath): array
+    public function parsing(string $filePath): string
     {
         $content = '';
         $file = fopen($filePath, 'r');
@@ -79,11 +79,14 @@ DOCOPT;
             exit;
         }
 
-        return json_decode($content, true);
+        return $content;
     }
 
-    public function genDiff(array $file1, array $file2): string
+    public function genDiff(string $json1, string $json2): string
     {
+        $file1 = json_decode($json1, true);
+        $file2 = json_decode($json2, true);
+
         ksort($file1);
         ksort($file2);
 
