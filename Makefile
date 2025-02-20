@@ -1,5 +1,7 @@
 install:
 	composer install
+install-linter:
+	composer global require "squizlabs/php_codesniffer=*"
 validate:
 	composer validate
 up-ul:
