@@ -26,5 +26,6 @@ jobs:
           uses: wearerequired/lint-action@v2
           with:
             php_codesniffer: true
+        - run: composer update
         - run: make install
         - run: make test
