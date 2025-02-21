@@ -2,16 +2,29 @@ name: test-system
 # on – определяет события, которые запускают воркфлоу
 on: push
 jobs:
-  # build – произвольно выбранное имя задания
-  # их может быть больше одного
-  build:
-    # операционная система для работы воркфлоу
-    runs-on: ubuntu-latest
-    steps: # список шагов, которые надо выполнить
-      # экшен — выполняет какую-то задачу
-      # checkout — клонирует репозиторий
-      - uses: actions/checkout@v4
-      # run – произвольная bash-команда
-      # ls -la выведет содержимое текущего репозитория
-      - run: make install
-      - run: make test
+  run-linters:
+      name: Run linters
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Check out Git repository
+          uses: actions/checkout@v4
+
+        - name: Set up PHP
+          uses: shivammathur/setup-php@v2
+          with:
+            php-version: "7.4"
+            coverage: none
+            tools: composer
+
+        - name: Install PHP dependencies
+          run: |
+            composer install --prefer-dist --no-progress --no-ansi --no-interaction
+            echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+
+        - name: Run linters
+          uses: wearerequired/lint-action@v2
+          with:
+            php_codesniffer: true
+        - run: make install
+        - run: make test
