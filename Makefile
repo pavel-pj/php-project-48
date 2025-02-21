@@ -14,4 +14,4 @@ gendiff:
 test:
 	composer exec --verbose phpunit tests
 test-coverage:
-	./vendor/bin/phpunit  --coverage-clover=build/logs/clover.xml tests
+	composer exec phpunit tests -- --coverage-clover build/logs/clover.xml
