@@ -13,22 +13,13 @@ jobs:
         - name: Set up PHP
           uses: shivammathur/setup-php@v2
           with:
-            php-version: "8.1"
-        #- name: Install PHP dependencies
-         # run: |
-         #   composer install --prefer-dist --no-progress --no-ansi --no-interaction
-         #   echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+                php-version: "8.1"
         - name: Install
-        # Install project
             run: make install
         - name: Run linters
-        #  uses: wearerequired/lint-action@v2
-        #  with:
-        #    php_codesniffer: true
             run: make lint
-
         - name: Run test & publish code coverage
-          uses: paambaati/codeclimate-action@v9.0.0
+            uses: paambaati/codeclimate-action@v9.0.0
                # Add Code Climate secret key
           env:
              CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
