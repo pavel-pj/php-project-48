@@ -24,6 +24,5 @@ class GendiffTest extends TestCase
          $result = $cli->genDiff($file1, $file2);
 
          $this->assertEquals($result, $fileExample);
-
     }
 }
