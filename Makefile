@@ -7,12 +7,12 @@ up-ul:
 git-graph:
 	git log --pretty=format:"%h %s" --graph
 lint:
-	composer exec --verbose phpcs -- --standard=PSR12 src
-	composer exec --verbose phpcs -- --standard=PSR12 tests
+	composer exec --verbose phpcs -- --standard=PSR12 src tests
 gendiff:
 	./bin/gendiff
 test:
 	composer exec --verbose phpunit tests
 test-coverage:
-	composer exec phpunit tests -- --coverage-clover build/logs/clover.xml
+	composer exec --verbose phpunit tests -- --coverage-clover build/logs/clover.xml
+
 	

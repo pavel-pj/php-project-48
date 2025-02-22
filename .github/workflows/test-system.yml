@@ -14,21 +14,18 @@ jobs:
           uses: shivammathur/setup-php@v2
           with:
             php-version: "8.1"
-            coverage: none
-            tools: composer
-
-        - name: Install PHP dependencies
-          run: |
-            composer install --prefer-dist --no-progress --no-ansi --no-interaction
-            echo "${PWD}/vendor/bin" >> $GITHUB_PATH
-
+        #- name: Install PHP dependencies
+         # run: |
+         #   composer install --prefer-dist --no-progress --no-ansi --no-interaction
+         #   echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+        - name: Install
+        # Install project
+            run: make install
         - name: Run linters
-          uses: wearerequired/lint-action@v2
-          with:
-            php_codesniffer: true
-        - run: composer update
-        - run: make install
-        - run: make lint
+        #  uses: wearerequired/lint-action@v2
+        #  with:
+        #    php_codesniffer: true
+            run: make lint
 
         - name: Run test & publish code coverage
           uses: paambaati/codeclimate-action@v9.0.0
