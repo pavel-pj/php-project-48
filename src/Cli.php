@@ -4,6 +4,7 @@ namespace Hexlet\Code;
 
 use Docopt;
 use Mockery\Exception;
+use Symfony\Component\Yaml\Yaml;
 
 class Cli
 {
@@ -37,38 +38,18 @@ class Cli
         }
 
         $filesData = [];
-        $filesData[] =  $this->parsing($filesPath[0]);
-        $filesData[] =  $this->parsing($filesPath[1]);
+        $filesData[] =  $this->parse($filesPath[0]);
+        $filesData[] =  $this->parse($filesPath[1]);
 
         $diff = $this->genDiff($filesData[0], $filesData[1]);
         echo $diff;
     }
 
-    public function showInfo()
+    //Открывает файл и переводит в универсальный набор массивов данные любого формата
+
+    public function parse(string $filePath): array
     {
-        $doc = <<<'DOCOPT'
-Generate diff
 
-Usage:
-  gendiff (-h|--help)
-  gendiff (-v|--version)
-  gendiff [--format <fmt>] <firstFile> <secondFile>
-
-Options:
-  -h --help                     Show this screen
-  -v --version                  Show version
-  --format <fmt>                Report format [default: stylish]
-
-DOCOPT;
-
-        $result = Docopt::handle($doc, array('version' => '1.0.0rc2'));
-        foreach ($result as $k => $v) {
-            echo $k . ': ' . json_encode($v) . PHP_EOL;
-        }
-    }
-
-    public function parsing(string $filePath): string
-    {
         $content = '';
         $file = fopen($filePath, 'r');
         if ($file) {
@@ -79,14 +60,28 @@ DOCOPT;
             exit;
         }
 
-        return $content;
+        $arrType = explode('.', $filePath);
+        $type = $arrType[count($arrType) - 1];
+
+        $result = [];
+
+        switch ($type) {
+            case 'json':
+                $result = json_decode($content, true);
+                break;
+            case 'yaml':
+                $result = Yaml::parse($content);
+                break;
+            default:
+                $result = [];
+                break;
+        }
+
+        return $result;
     }
 
-    public function genDiff(string $json1, string $json2): string
+    public function genDiff(array $file1, array $file2)
     {
-        $file1 = json_decode($json1, true);
-        $file2 = json_decode($json2, true);
-
         ksort($file1);
         ksort($file2);
 
@@ -122,5 +117,28 @@ DOCOPT;
         }
 
         return json_encode($result2, JSON_PRETTY_PRINT);
+    }
+
+    public function showInfo()
+    {
+        $doc = <<<'DOCOPT'
+Generate diff
+
+Usage:
+  gendiff (-h|--help)
+  gendiff (-v|--version)
+  gendiff [--format <fmt>] <firstFile> <secondFile>
+
+Options:
+  -h --help                     Show this screen
+  -v --version                  Show version
+  --format <fmt>                Report format [default: stylish]
+
+DOCOPT;
+
+        $result = Docopt::handle($doc, array('version' => '1.0.0rc2'));
+        foreach ($result as $k => $v) {
+            echo $k . ': ' . json_encode($v) . PHP_EOL;
+        }
     }
 }

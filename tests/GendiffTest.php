@@ -7,11 +7,26 @@ use Hexlet\Code\Cli;
 
 class GendiffTest extends TestCase
 {
+    public function testParse()
+    {
+        $cli = new Cli();
+
+        $expected = [
+            'host'      => 'hexlet.io',
+            'timeout'   => 50,
+            'proxy'     => '123.234.53.22',
+            'follow'    => false
+        ];
+        $fileData = $cli->parse('./tests/fixtures/file1-origin.json');
+
+        $this->assertEquals($expected, $fileData);
+    }
+
     public function testGendiff(): void
     {
          $cli = new Cli();
-         $file1 = '{"host":"hexlet.io","timeout":50,"proxy":"123.234.53.22","follow":false}';
-         $file2  = '{"timeout":20,"verbose":true,"host":"hexlet.io"}';
+         $fileString1 = '{"host":"hexlet.io","timeout":50,"proxy":"123.234.53.22","follow":false}';
+         $fileString2  = '{"timeout":20,"verbose":true,"host":"hexlet.io"}';
          $example = [
             "- follow" => false,
             "host" => "hexlet.io",
@@ -20,9 +35,13 @@ class GendiffTest extends TestCase
             "+ timeout" => 20,
             "+ verbose" => true
          ];
-         $fileExample = json_encode($example, JSON_PRETTY_PRINT);
+
+         $file1 = json_decode($fileString1, true);
+         $file2 = json_decode($fileString2, true);
+
+         $fileExample =  json_encode($example, JSON_PRETTY_PRINT);
          $result = $cli->genDiff($file1, $file2);
 
-         $this->assertEquals($result, $fileExample);
+         $this->assertJsonStringEqualsJsonString($result, $fileExample);
     }
 }
