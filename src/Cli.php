@@ -1,5 +1,5 @@
 <?php
-/*
+
 namespace Hexlet\Code;
 
 use Docopt;
@@ -124,4 +124,3 @@ DOCOPT;
         return json_encode($result2, JSON_PRETTY_PRINT);
     }
 }
-*/

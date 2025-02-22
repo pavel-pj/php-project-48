@@ -9,8 +9,8 @@ if (file_exists($autoloadPath1)) {
 } else {
     require_once $autoloadPath2;
 }
-/*
- use Hexlet\Code\Cli;
+
+use Hexlet\Code\Cli;
 
  $cli = Cli::cli($argv);
  try {
@@ -20,4 +20,3 @@ if (file_exists($autoloadPath1)) {
   } finally {
         echo "\nРабота программы заверешена.\n";
    }
-*/
