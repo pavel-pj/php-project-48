@@ -3,7 +3,7 @@
 namespace Hexlet\Code\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Hexlet\Code\Cli;
+//use Hexlet\Code\Cli;
 
 class GendiffTest extends TestCase
 {
