@@ -1,7 +1,6 @@
 {
     "name": "hexlet/code",
     "description": "Project-48",
-    "type": "project",
     "license": "MIT",
     "autoload": {
         "psr-4": {
@@ -14,13 +13,7 @@
             "email": "voroshilow_pavel@mail.ru"
         }
     ],
-    "scripts": {
-        "phpcs":"phpcs",
-        "phpunit": "phpunit"
-    },
-
-    "minimum-stability": "stable",
-    "require": {
+   "require": {
         "docopt/docopt": "^1.0",
         "lstrojny/functional-php": "^1.17",
         "symfony/yaml": "^5.4",
