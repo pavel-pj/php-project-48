@@ -49,4 +49,18 @@ class GendiffTest extends TestCase
         */
         $this->assertEquals(1, 1);
     }
+
+    public function testGetNormalizeValue(): void {
+
+        $cli = new Cli();
+
+        $value = true;
+        $expected = "true";
+
+        $this->assertEquals($expected, $cli->getNormalizeValue($value));
+
+
+
+
+    }
 }
