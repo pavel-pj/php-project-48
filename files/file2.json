@@ -1,5 +1,8 @@
 {
-  "timeout": 20,
-  "verbose": true,
-  "host": "hexlet.io"
+  "common": {
+    "follow": false,
+    "setting5": {
+      "key5": "value5"
+    }
+  }
 }

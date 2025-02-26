@@ -6,6 +6,7 @@
         "psr-4": {
             "Hexlet\\Code\\": "src/"
         }
+
     },
     "authors": [
         {
@@ -22,7 +23,7 @@
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.7",
         "phpunit/phpunit": "^9.5",
-        "phpstan/phpstan": "^1.9"
-
+        "phpstan/phpstan": "^1.9",
+        "illuminate/collections": "^10.48"
     }
 }
