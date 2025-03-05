@@ -23,8 +23,8 @@ class Format
     {
          $result = $this->normalize($data);
          print_r($result);
-         $toPrint = $this->print($result);
-         print_r($toPrint);
+       //  $toPrint = $this->print($result);
+       //  print_r($toPrint);
     }
 
     public function normalize($data)
@@ -65,8 +65,8 @@ class Format
         //Создаётся новый массив с вложенными элементами, который сольётся с другими
 
         //Если для item два значения. (строки -+)
-        $rows = explode('|', $item);
-        $newItem = implode("\n{$indent}", $rows);
+       // $rows = explode('|', $item);
+       // $newItem = implode("\n{$indent}", $rows);
 
         //Пустые значения, появившиеся после слияния второго файла
 
