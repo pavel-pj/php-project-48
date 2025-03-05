@@ -61,21 +61,13 @@ class newCli3
         $filesData[] =  $this->parse($filesPath[0]);
         $filesData[] =  $this->parse($filesPath[1]);
 
-      //  $result = $this->greatDiff($filesData[0], $filesData[1]);
         $this->file01 = $this->makeNormalTree($filesData[0]);
         $this->file02 = $this->makeNormalTree($filesData[1]);
 
-      //  echo "ПЕРВЫЙ ФАЙЛ НАЧАЛО\n";
-       // print_r($this->file01);
+       // print_r($this->file02);
 
-        $result = $this->diffTree();
-        echo "ОКОНЧАТЕЛЬНЫЙ РЕЗУЛЬТАТ: \n";
-          print_r($result);
-
-       // $resultFlatten =  $this->flat($result);
-
-        // print_r($resultFlatten);
-
+       $result = $this->diffTree();
+        //  print_r($result);
         $this->formater->formatData($result);
     }
 
@@ -85,8 +77,11 @@ class newCli3
 
 
        $result = $this->iterateToDiff($this->file01, true);
-       $result = $this->normalizeArray($result);
-       return $result;
+      // $result = $this->normalizeArray($result);
+
+
+
+        return $result;
 
 
     }
@@ -279,7 +274,7 @@ class newCli3
             $file2 = $this->file02;
         }
 
-        echo "Проверяем директорию\n";
+        //echo "Проверяем директорию\n";
 
         if (!is_array($file2)) {
             return $file2;
@@ -288,6 +283,11 @@ class newCli3
         $childs = array_map(function ($item) use ($node, &$acc) {
 
             if ($this->treeService->isDirectory($item)) {
+
+                //echo "Проверяем во втором файле ДИРЕКТОРИЮ :\n";
+                //print_r($item);
+
+
                 $result = $this->isNodeFound($node, $item);
 
                 if ($result === true) {
@@ -296,6 +296,9 @@ class newCli3
                     $acc['comparison'] = 'deleted';
                 }
             }
+
+            return $this->findDirectory($node,$acc,$item);
+
         }, $file2);
 
         if ($acc) {
@@ -354,6 +357,13 @@ class newCli3
     {
         $result = false;
 
+          //echo "ПРОВЕРЯЕМ ДВЕ ДИРЕКТОРИИ.\n";
+         // print_r($item1);
+         // print_r($item2);
+
+
+
+
         if (
             $item1['name'] === $item2['name'] &&
             $item1['path'] === $item2['path'] &&
@@ -393,7 +403,7 @@ class newCli3
                     $result = [
                         'type'=> FileType::File->value,
                         'name' => $key,
-                        'value' => $item,
+                        'value' => $this->getNormalizeValue($item),
                         'path' => $accPath,
                         'comparison' => 'matched'
                         ];

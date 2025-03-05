@@ -26,18 +26,91 @@ class newFormat
 
     public function formatData(array $data)
     {
-        echo "***********FORMAT*************\n";
+       // echo "***********FORMAT*************\n";
         //$result = $this->iterateFormat($data);
         $data = $data['childs'];
-        $result= $this->flat($data);
-        print_r( $result);
+       // $result= $this->flat($data);
 
-        //$res = [];
-        //$result = $this->createListFlat($data,$res);
-        //print_r($res );
+
+        echo "РЕЗУЛЬТАТ\n";
+        $result = $this->createList($data );
+        echo "\n\n";
+        echo $result;
+        echo "\n\n";
+
+    }
+
+    public function createList(array $data): string {
+
+        $info = $this->createListIterate($data, 0);
+        //print_r( $info);
+        $result = implode("\n", $info);
+
+        return "{\n".$result."\n}";
+
+    }
+
+    public function createListIterate($data, int $level )
+    {
+        $symbol = " ";
+        $leftIndent =str_repeat($symbol, 2);
+        $indent = str_repeat($symbol, 2);
+
+        if (!is_array($data)) {
+            return $data;
+        }
+
+        $childs = array_map(function ($item) use ($level,$indent, $leftIndent) {
+
+            $level += 1;
+            $indent = str_repeat($indent , $level);
+            $result = $this->createListIterate($item, $level);
+            if ( $this->treeService->isFile($result)) {
+
+                $prefix = $this->getPrefixByComparison($result['comparison']);
+                return $indent.$prefix.$result['name'] . ": ". $result['value'];
+
+            }
+            if ( $this->treeService->isDirectory($result)) {
+
+                $prefix = $this->getPrefixByComparison($result['comparison']);
+                $files = implode("\n" , $result['childs']);
+
+                return $indent. $prefix.$result['name'] . ": {\n". $files. "\n".$indent. $leftIndent."}";
+
+
+            }
+            else return $result;
+
+
+
+
+        }, $data);
+
+
+
+        //$result = implode("\n", $childs);
+        return $childs;
 
 
     }
+
+
+    public function getPrefixByComparison($comparison)
+    {
+
+        return match ($comparison) {
+            'added' => '+ ',
+            'deleted' => '- ',
+            'matched' => '  ',
+            default => '*ОШИБКА*',
+
+        };
+
+
+    }
+
+    /*
     public function flat(array $node)
     {
 
@@ -73,66 +146,7 @@ class newFormat
         }
         return $childs ;
     }
-
-
-/*
-    public function createList($data,&$acc)
-    {
-
-        if (!is_array($data)) {
-            return $data;
-        }
-
-        $childs = array_map(function ($item ) use (&$acc){
-
-            return $this->createList($item, $acc);
-        }, $data);
-
-
-        if ($this->treeService->isDirectory($data)) {
-            echo "Мы в директории\n";
-            $acc[] = "HOOO";
-            foreach ($childs as $child) {
-
-                if(is_array($child[0])){
-
-                    $acc [] = $child[0]['name'] ;
-                }
-
-
-                echo "В цикле\n";
-                if ( $this->treeService->isFile($child)) {
-                    echo "мы в файле\n";
-                    $acc [] = $child ;
-               // $format[] = $child['name'];
-                } else if ( $this->treeService->isDirectory($child)) {
-                    $acc [] = $child['name'];
-                    // $format[] = $child['name'];
-                }
-            }
-        }
-
-        return $childs;
-
-
-    }
-    /*
-
-    public function getPrefixByComparison($comparison)
-    {
-
-        return match ($comparison) {
-            'added' => '+ ',
-            'deleted' => '- ',
-            'matched' => '  ',
-            default => '*ОШИБКА*',
-
-        };
-
-
-    }
-
-
+*/
 
 
 /*

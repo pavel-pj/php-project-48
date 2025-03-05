@@ -1,9 +1,7 @@
 {
-
-  "city": null,
-  "cit5y": "Moscow",
-  "folder": {
-    "oew": 1131
+  "common": {
+    "setting5": {
+      "key5": "value5"
+    }
   }
-
 }
