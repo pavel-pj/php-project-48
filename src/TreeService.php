@@ -8,63 +8,51 @@ class TreeService
 {
     public function isFile($node): bool
     {
-        if (is_array($node) && array_key_exists('type', $node)) {
-            if ($node['type'] === FileType::File->value) {
-                return true;
-            }
-        }
-        return false;
+       if (!is_array($node)) {
+           return false;
+       }
+        /*
+       echo "\n*********ПРОВЕРКА ФАЙЛА\n";
+       echo "Входящий узел:\n";
+       if (is_array($node)) {
+           echo "узел - массив\n";
+           print_r($node);
+       } else {
+           echo "Узел НЕ МАССИВ\n";
+           echo $node;
+       }
+        */
+
+       if (array_key_exists('type',$node)) {
+           /*
+            echo "Это ВСЕ ТАКИ УЗЕЛ, ЕСТЬ type\n";
+            echo "сам узел\n";
+            print_r($node);
+           echo "значение node Type = \n";
+            echo $node['type']."\n";
+          // echo "сравниваеммое :\n";
+          // echo FileType::File->value ."\n";*/
+           if ($node['type'] === FileType::File->value) {
+              // echo "ДА, ЭТО ФАЙЛ!\n";
+               return true;
+           }
+       }
+
+       return false;
     }
     public function isDirectory($node): bool
     {
-        if (is_array($node) && array_key_exists('type', $node)) {
-            if ($node['type'] === FileType::Directory->value) {
-                return true;
-            }
+        if (!is_array($node)) {
+            return false;
         }
+
+        if (array_key_exists('type',$node) &&
+            $node['type'] === FileType::Directory->value) {
+                return true;
+         }
+
         return false;
     }
 
-    //*****************************************************************
-    //Сделать type = обязательным значением
-    public function isNodeInOtherFile(array $path, $fileType, array $result  )
-    {
-        if (!$result) {
-            return false;
-        }
-        //$result = файл, в котором проверять вхождение текущего узла/директории
 
-        //path  - массив со списками ключей
-        //Для корневой директории $path = root
-        $normPath = array_filter($path, function ($item) {
-            return $item !== 'root';
-        });
-
-        if (!empty($normPath)) {
-            foreach ($normPath as $key) {
-                //Нашли ключ
-
-                if (!is_array($result)) {
-                    return false;
-                }
-                if (array_key_exists($key, $result)) {
-
-                    $result = $result[$key];
-                } else {
-                    return false;
-                }
-
-            }
-        }
-
-        //Типы должны соппадать
-        if ((is_array($result) && $fileType == FileType::Directory->value) ||
-            (!is_array($result) && $fileType == FileType::File->value))
-        {
-            return true;
-        }  else {
-            return false;
-        }
-
-    }
 }

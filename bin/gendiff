@@ -10,9 +10,9 @@ if (file_exists($autoloadPath1)) {
     require_once $autoloadPath2;
 }
 
-use Hexlet\Code\newCli3;
+use Hexlet\Code\Cli;
 
- $cli = newCli3::cli($argv);
+ $cli = Cli::cli($argv);
  
  try {
     $cli->runProgram();

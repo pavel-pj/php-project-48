@@ -2,8 +2,10 @@
 
 namespace Hexlet\Code;
 
+use App\Http\Controllers\Auth\PasswordController;
 use Docopt;
 use Mockery\Exception;
+use PHPUnit\Framework\Error;
 use Symfony\Component\Yaml\Yaml;
 use Hexlet\Code\Format;
 use Illuminate\Support\Collection;
@@ -16,6 +18,12 @@ class Cli
     public const NOT_EXIST = 'not_exists';
     public const FIRST_FILE = 'first_file';
     public const SECOND_FILE = 'second_file';
+
+    public array $file01;
+    public array $file02;
+
+    public $checkedFile;
+
     public Format $formater;
     public TreeService $treeService;
 
@@ -53,338 +61,358 @@ class Cli
         $filesData[] =  $this->parse($filesPath[0]);
         $filesData[] =  $this->parse($filesPath[1]);
 
+        $this->file01 = $this->makeNormalTree($filesData[0]);
+        $this->file02 = $this->makeNormalTree($filesData[1]);
+        $result = $this->diffTree();
+        $sortResult = $this->sortTreeByComparison($result);
 
-       // $fileNorm1 = $this->fileNorm1($filesData[0]);
-
-      //  print_r($fileNorm1);
-
-
-
-        $result = $this->greatDiff($filesData[0], $filesData[1]);
-
-        $resultFlatten =  $this->flat($result);
-
-        // print_r($resultFlatten);
-
-        $this->formater->formatData($resultFlatten);
-    }
-    public function greatDiff(array $file1, array $file2)
-    {
-        $sortedFile1 = $this->sortDiff($file1);
-        $sortedFile2 = $this->sortDiff($file2);
-
-
-        print_r($sortedFile1);
-
-
-        $res1 = $this->iterateFile(
-            $sortedFile1,
-            $sortedFile2,
-            true,
-            self::FIRST_FILE,
-            ['root']
-        );
-
-        $res2 = $this->iterateFile(
-            $sortedFile2,
-            $sortedFile1,
-            true,
-            self::SECOND_FILE,
-            ['root']
-        );
-
-        $res03 = array_merge_recursive($res1, $res2);
-
-        return $res03;
+        $this->formater->formatData($sortResult);
     }
 
-    public function iterateFile(
-        $node1, // Элемент первого файл ( узел)
-        $node2, // Второй файл целиком
-        bool $isPreviousFolderExists, // если корневая директория НЕ НАЙДЕНА(false) - не проверяем вложенные
-        string $firstOrSecondFile, //Первый файл = self::FIRST_FILE, второй - self::SECOND_FILE
-        array $accPath = [], //массив пути до файла/директории
-        $key1 = null
-    ) {      // текущий ключ
 
-         //При проверке второго файла добавляем только не найденное со знаком +, т.е наоборот.
+    public function sortTreeByComparison(&$node) {
+        //Сортирует Дифф ( файл после сравнения.
+        //1 По алфавиту
+        // Сначала -(deleted), затем +(added)
 
-         //Для файла мы не увеличиваем путь
-        if ($key1) {
-            $accPath[] = $key1;
-        }
-
-        //Если узел
-        if (!is_array($node1)) {
-            return $this->getDiffFile(
-                $node1,
-                $node2,
-                $isPreviousFolderExists,
-                $firstOrSecondFile,
-                $accPath,
-                $key1
-            );
-        }
-
-        //Если папка не существует во 2 файле, вложенные файлы не анализируются
-        //По умолчанию текущую папку и вложенные не проверяем, если предыдущая не найдена
-        $isFolderExists = false;
-        if ($isPreviousFolderExists) {
-            $isFolderExists = $this->isFolderExists($node2, $accPath);
-        }
-
-        $node1Childs = array_map(function ($value, $key) use ($node2, $accPath, $isFolderExists, $firstOrSecondFile) {
-             $result = $this->iterateFile(
-                 $value,
-                 $node2,
-                 $isFolderExists,
-                 $firstOrSecondFile,
-                 $accPath,
-                 $key
-             );
-             return $result;
-        }, $node1, array_keys($node1));
-
-        // Для проверки узлом при 2 рекрусии, т.е из 2 json в первый - узлый(файлы),
-        // которые совпадают по ключу и значению
-        // маркируются 00, т.е в итоговом массиве будет 00myFile.
-        // на этом этапе исключаем такие файлы, т.к они уже есть при первой проверке
-
-        $filteredResult = array_filter($node1Childs, function ($item) {
-            return substr($item['value'], 0, 2) !== '00';
-        });
-
-        //текущая директория
-        $result = $this->getDiffDirectory(
-            $node1,
-            $node2,
-            $isPreviousFolderExists,
-            $filteredResult,
-            $accPath,
-            $firstOrSecondFile
-        );
-        return $result;
-    }
-    public function isFolderExists($node2, $path = []): bool
-    {
-        $result = $this->getNodeOrFalse($node2, $path);
-        if ($result === self::NOT_EXIST) {
-            return false;
-        }
-        //Если директория сущесвтует во втором файле, true
-        return true;
-    }
-
-    public function getDiffDirectory(
-        $node1,
-        $node2,
-        bool $isFolderExists,
-        array $childs,
-        array $path,
-        string $firstOrSecondFile //Первый файл = self::FIRST_FILE, второй - self::SECOND_FILE
-    ) {
-        //node1 - искомая директория
-        //node2 - весь массив другого файла
-        //path - массив ключей
-        //Для корневой директории $path = root
-
-        //Имя директории  - последний элемент массива path
-
-        $dir1Value = $this->getNormalizeValue($path[count($path) - 1]);
-        $dir2Value = $this->getNodeOrFalse($node2, $path);
-
-        //Директория найдена, или же родитель не найден, значит не анализируется текущая директория
-        $result = "  " . $dir1Value;
-        if ($firstOrSecondFile === self::FIRST_FILE) {
-            //Директория анализируется если Родительская директория найдена
-            if ($isFolderExists) {
-                //Директория найдена во 2 файле
-                if ($dir2Value !== self::NOT_EXIST) {
-                    //Директория найдена
-                    $result = '  ' . $dir1Value;
-                } else {
-                    $result = " - {$dir1Value}";
-                }
-            }
-        } elseif ($firstOrSecondFile === self::SECOND_FILE) {
-            if ($isFolderExists) {
-                //Директория найдена во 2 файле
-                if ($dir2Value !== self::NOT_EXIST) {
-                    //Директория найдена
-                    $result = '  ' . $dir1Value;
-                } else {
-                    $result = "- {$dir1Value}";
-                }
-            }
-        }
-
-        return [
-            'path' => $path,
-            'type' => FileType::Directory->value,
-            'childs' =>  $childs,
-            'value' => $result
-        ];
-    }
-
-    public function getDiffFile(
-        $node1,
-        $node2,
-        bool $isFolderExists,
-        string $firstOrSecondFile,
-        $accPath,
-        $key1 = null
-    ) {
-        $resultToReturn = '';
-        //Если папка, в которой находится данный файл не найдена во 2 файле, то не выполняем проверку
-
-
-
-        $file1Value = $this->getNormalizeValue($node1);
-        $resultToReturn = "  {$key1}: {$file1Value}";
-
-        //ДЛЯ ПЕРВОГО ФАЙЛА
-        if ($firstOrSecondFile === self::FIRST_FILE) {
-            if ($isFolderExists) {
-                $file2Value = $this->getNodeOrFalse($node2, $accPath);
-                //Если нашли
-
-                if ($file2Value !== self::NOT_EXIST) {
-                    $file2Value = $this->getNormalizeValue($file2Value);
-                    //  echo "ключ : {$key1}, знч file1: {$file1Value} ; file2: {$file2Value}\n\n";
-
-                    if ($file1Value === $file2Value) {
-                        //Если значение узлов совпадают
-                        $result = "  {$key1}: {$file1Value}";
-                    } else {
-                        //значения узлов НЕ совпадают
-                        $result = "- {$key1}: {$file1Value} |";
-                        $result .= "+ {$key1}: {$file2Value}";
-                    }
-                    $resultToReturn = $result;
-                } else {
-                    //ЕСЛИ УЗЕЛ НЕ НАЙДЕН ВО 2 ФАЙЛЕ
-                    $resultToReturn = "- {$key1}: {$file1Value}";
-                }
-            }
-        } elseif ($firstOrSecondFile == self::SECOND_FILE) {
-            //ДЛЯ ВТОРОГО ФАЙЛА
-            $file2Value = $this->getNodeOrFalse($node2, $accPath);
-          //  echo "\n\n ПОСЛЕ ПРОВЕРКИ :\n";
-          //  echo "ПУТЬ :\n";
-          //  print_r($accPath);
-          //  echo "ЗНАЧЕНИЕ :\n";
-          //  print_r($file2Value);
-
-           // echo "сравниваем значение {$file2Value} и ". self::NOT_EXIST . "\n";
-            //echo "если сравнение пошло на следующей строке АПА\n";
-            if ($file2Value === self::NOT_EXIST) {
-               // echo "АПА\n\n\n";
-               // echo "\nФАЙЛ 2. Значение узла в первом файле с ключом {$key1} :{$file2Value}\n";
-                $resultToReturn = "+ {$key1}: {$file1Value}";
-            } elseif ($file1Value === $file2Value) {
-                //флаг, впоследсви такие файлы удаляются, так как они уже есть при первой проверке
-                $resultToReturn = "00{$key1}: {$file1Value}";
-            } else {
-                $resultToReturn = "00{$key1}: {$file1Value}";
-            }
-        }
-
-        return [
-            'path' => $accPath,
-            'type' => FileType::File->value,
-            'value' => $resultToReturn
-        ];
-    }
-
-    public function getNodeOrFalse($node, array $path)
-    {
-        //path  - массив со списками ключей
-        //Для корневой директории $path = root
-        $normPath = array_filter($path, function ($item) {
-            return $item !== 'root';
-        });
-
-        $result = $node;
-
-        if (!empty($normPath)) {
-            foreach ($normPath as $key) {
-                 //Нашли ключ
-
-                if (!is_array($result)) {
-                    return self::NOT_EXIST;
-                }
-                if (array_key_exists($key, $result)) {
-                     $result = $result[$key];
-                } else {
-                    return self::NOT_EXIST;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    public function flat(array $node)
-    {
-    /**  выравнивание в одну плоскость
-     *
-     * Все Директории имеют вид :
-     * [
-     * 'path' => ['root','common'],
-     * 'type' => 'directory',
-     * 'childs'=>  array
-     * ]
-     *
-     * Файлы :
-     * [
-     * 'path' => ['root','common'],
-     * 'type' => 'file',
-     * 'value' =>"-+ common'
-     * ]
-    */
-        $format = [];
-        $result = $this->flatIterate($node, $format);
-        return $format;
-    }
-
-    public function flatIterate($node, &$acc)
-    {
         if (!is_array($node)) {
             return $node;
         }
 
-        $childs = array_map(function ($item) use (&$acc) {
-            return $this->flatIterate($item, $acc);
-        }, $node);
+       $childs = array_map(function ($item) {
+           return $this->sortTreeByComparison($item);
+       },$node);
 
-        if ($this->treeService->isFile($node)) {
-            $acc[] = [
-                'path' => $node['path'],
-                'type' => $node['type'],
-                'value' => $node['value']
-            ];
-        } elseif ($this->treeService->isDirectory($node)) {
-            $acc[] = [
-                'path' => $node['path'],
-                'type' => $node['type'],
-                'value' => $node['value']
-            ];
+        if ($this->treeService->isDirectory($node)) {
+
+            $arrs = $childs['childs'];
+            //print_r($arrs);
+
+            usort($arrs, function ($a, $b) {
+
+                if ($a['name'] > $b['name']) {
+                    return 1;
+                } elseif ($a['name'] < $b['name']) {
+                    return -1;
+                } else {
+
+                    if ($a['comparison'] === 'deleted' && $b['comparison'] === 'added') {
+                        return -1;
+                    } elseif ($b['comparison'] === 'deleted' && $a['comparison'] === 'added') {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
+            });
+            $childs['childs'] = $arrs;
         }
-         return $childs ;
+        return $childs;
     }
-    //Приводит "неудобные значения" true,false,null  - к их строковым аналогам
-    public function getNormalizeValue($value)
-    {
-        $result = $value;
 
-        if ($value === true) {
-            $result = 'true';
-        } elseif ($value === false) {
-            $result = 'false';
-        } elseif ($value === null) {
-            $result = 'null';
+    public function diffTree(){
+
+       $result = $this->iterateToDiff($this->file01, true);
+       return $result;
+    }
+
+    public function iterateToDiff ($node , bool $isNeedToCheckPreviousNode) {
+
+        //Выводим дифф, всё, что имеется + данные из 2 файла
+
+        if(!is_array($node)){
+            return $node;
+        }
+
+        $childs = array_map(function ($item) use ($isNeedToCheckPreviousNode) {
+
+
+            $isNeedToCheck = $isNeedToCheckPreviousNode;
+
+            //false - не проверяем
+            if ($isNeedToCheckPreviousNode == true ) {
+                //Проверяем Директории ( имя )
+                $accDir = [];
+                if ($this->treeService->isDirectory($item)) {
+
+
+                    $result = $this->findDirectory($item, $accDir);
+                    //Если директория не найдена, acc удет пустой
+                    if (!$accDir) {
+                        $item['comparison'] = "deleted";
+                    } else {
+                        $item['comparison'] = $accDir['comparison'];
+                    }
+
+                    if ($item['comparison'] === "deleted") {
+                        $isNeedToCheck = false;
+                    } else {
+                        $isNeedToCheck = true;
+                    }
+                }
+            }
+            return $this->iterateToDiff($item, $isNeedToCheck);
+        },$node);
+
+        //Проверяем со вторым файлом.
+
+        //Сюда заносим новые/имзененные узлы, которые нужно добавить в корень
+        $addedNodes = [];
+        foreach($childs as &$item) {
+
+            $acc = [];
+            //Проверяем только файлы
+            if($this->treeService->isFile($item)) {
+
+                $result = $this->findFile($item, $acc);
+               // $item['comparison'] = $acc;
+                if (array_key_exists('comparison',$acc)){
+
+                    $item['comparison'] = $acc['comparison'];
+                    //Для имзененных. added добавлено ниже, в корневую директорию
+                    if ($acc['comparison'] === 'changed' ) {
+                        $item['comparison'] = 'deleted';
+                        $addedNodes [] = $acc['newItem'];
+                    }
+                }
+                else {
+                    $item['comparison'] = "deleted";
+                }
+
+                //Если предыдущая директорию изменять не нужно
+                if ($isNeedToCheckPreviousNode === false) {
+                        $item['comparison'] = 'matched';
+                }
+            }
+        }
+
+        //определяем все имена папок и файлов, которые сейчас в текущей директории
+        //Чтобы получить те узлы из нового списка, которых нет в текущем файле
+        $nodeNames = $this->getAllNamesOfNode ($node);
+
+        $newNodes= $this->newNodesFrom2File($node,$nodeNames);
+
+        foreach($addedNodes as $addedNode) {
+             $childs[] = $addedNode;
+        }
+
+        foreach($newNodes as $newNode) {
+          $childs['childs'][] = $newNode;
+        }
+        return $childs;
+    }
+
+    public function newNodesFrom2File(array $node, array $nodeNames)
+    {
+        $file2 = $this->file02;
+
+        $acc = [];
+        $result = $this->iterateToCheckNewFiles($node, $nodeNames, $file2, $acc );
+
+        return $acc;
+    }
+
+    public function iterateToCheckNewFiles(
+        array $node,
+        array $nodeNames,
+        $file2,
+        array &$acc) {
+
+        if (!is_array($file2)) {
+            return $file2;
+        }
+
+        $childs = array_map(function ($item) use ($node, $nodeNames, &$acc) {
+
+            if ($this->treeService->isFile($item) || $this->treeService->isDirectory($item)) {
+                if ($this->isNodesInTheSameFolder($node, $item)) {
+                    if (!in_array($item['name'], $nodeNames)) {
+                        $item['comparison'] = 'added';
+                        $acc[] = $item;
+                    }
+                }
+            }
+            $res = $this->iterateToCheckNewFiles($node, $nodeNames, $item, $acc);
+        }, $file2);
+        return $childs;
+    }
+
+    public function isNodesInTheSameFolder($item1, $item2)
+    {
+        //item1 - корневая директория
+        if (!( $this->treeService->isFile($item1) || $this->treeService->isDirectory($item1)) &&
+            ( $this->treeService->isFile($item2) || $this->treeService->isDirectory($item2))
+        ) {
+            return false;
+        }
+
+        $path1 = $item1['path'];
+        $path2 = $item2['path'];
+
+        unset($path2[count($path2) - 1]);
+
+
+        if ($path1 === $path2) {
+          //  echo "ПАПКИ ИЛИ  ФАЙЛЫ СОВПАЛИ\n";
+          //  print_r($path1);
+          //  print_r($path2);
+
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getAllNamesOfNode($node)
+    {
+        $result = [];
+
+        if ($this->treeService->isDirectory($node)) {
+            foreach ($node['childs'] as $item) {
+                if ($this->treeService->isFile($item) || $this->treeService->isDirectory($item)) {
+                    $result[] = $item['name'];
+                }
+            }
         }
         return $result;
+    }
+
+    public function findDirectory($node, array &$acc, $file2 = null)
+    {
+        //ищем node директорию во втором файле
+
+        if ($file2 === null) {
+            $file2 = $this->file02;
+        }
+
+        //echo "Проверяем директорию\n";
+
+        if (!is_array($file2)) {
+            return $file2;
+        }
+
+        $childs = array_map(function ($item) use ($node, &$acc) {
+
+            if ($this->treeService->isDirectory($item)) {
+                $result = $this->isNodeFound($node, $item);
+
+                if ($result === true) {
+                    $acc['comparison'] = 'matched';
+                }
+            }
+            return $this->findDirectory($node, $acc, $item);
+        }, $file2);
+
+        if ($acc) {
+            return [];
+        } else {
+            return $childs;
+        }
+    }
+
+    public function findFile($node, array &$acc, $file2 = null)
+    {
+        if ($file2 === null) {
+            $file2 = $this->file02;
+        }
+
+        if (!is_array($file2)) {
+            return $file2;
+        }
+
+        $childs = array_map(function ($item) use ($node, &$acc) {
+        //**ПРОВЕРКА ДЛЯ ФАЙЛА-----------------------------------------------
+            if ($this->treeService->isFile($item)) {
+                  $result = $this->isNodeFound($node, $item);
+                  //Если ключ и path совпадает
+
+                if ($result === true) {
+                    if ($item['value'] === $node['value']) {
+                        $acc['comparison'] = 'matched';
+                        //return $acc;
+                    } else {
+                        $acc['comparison'] = "changed";
+                        $acc['newItem'] = $item;
+                        //добавляем новому элементу статус
+                        $acc['newItem']['comparison'] = 'added';
+                    }
+                } else {
+                      //Если файлы не совпадают по ключу
+                    return [];
+                }
+            } elseif ($acc) {
+                //Если аккумулятор не пустой, то смысла в проверке далее нет.
+                return [];
+            }
+                    //Если директория - просто обходим
+            return $this->findFile($node, $acc, $item);
+        }, $file2);
+
+        return $childs;
+    }
+
+    //Проверяем 2 узла по type,name,path.
+    public function isNodeFound(array $item1, array $item2): bool
+    {
+        $result = false;
+
+        if (
+            $item1['name'] === $item2['name'] &&
+            $item1['path'] === $item2['path'] &&
+            $item1['type'] === $item2['type']
+        ) {
+            $result = true;
+        }
+        return $result;
+    }
+
+    public function makeNormalTree(array $file01)
+    {
+        $file = $this->sortDiff($file01);
+
+        $fileTree = $this->iterateToMakeTree($file, ['root']);
+
+        $result = [];
+        //описание корневой директории
+        $result ['name'] = 'root';
+        $result ['type'] = 'directory';
+        $result ['path'] = ['root'];
+        $result ['childs'] = $fileTree;
+        return $result;
+    }
+
+    public function iterateToMakeTree($file, $accPath)
+    {
+        if (!is_array($file)) {
+            return $file;
+        }
+
+        $childs = array_map(function ($item, $key) use ($accPath) {
+            $accPath[] = $key;
+            $result = $this->iterateToMakeTree($item, $accPath);
+
+            if (!is_array($result)) {
+                $result = [
+                    'type' => FileType::File->value,
+                    'name' => $key,
+                    'value' => $this->getNormalizeValue($item),
+                    'path' => $accPath,
+                    'comparison' => 'matched'
+                    ];
+            } elseif (is_array($result)) {
+                $result = [
+                    'type' => FileType::Directory->value,
+                    'name' => $key,
+                    'path' => $accPath,
+                    'childs' => $result,
+                    'comparison' => 'matched'
+                ];
+            }
+            return $result;
+        }, $file, array_keys($file));
+
+        return $childs ;
     }
 
     public function sortDiff($node)
@@ -400,6 +428,39 @@ class Cli
         ksort($childs, 3);
         return $childs;
     }
+
+
+
+
+    public function normalizeArray($node)
+    {
+        if (!is_array($node)) {
+            return $this->getNormalizeValue($node);
+        }
+
+        $childs = array_map(function ($item) {
+            return $this->normalizeArray($item);
+        }, $node);
+
+        return $childs;
+    }
+
+
+    //Приводит "неудобные значения" true,false,null  - к их строковым аналогам
+    public function getNormalizeValue($value)
+    {
+        $result = $value;
+
+        if ($value === true) {
+            $result = 'true';
+        } elseif ($value === false) {
+            $result = 'false';
+        } elseif ($value === null) {
+            $result = 'null';
+        }
+        return $result;
+    }
+
 
     //Открывает файл и переводит в универсальный набор массивов
     // данные любого формата
@@ -436,8 +497,6 @@ class Cli
 
         return $result;
     }
-
-
 
 
     public function showInfo()
