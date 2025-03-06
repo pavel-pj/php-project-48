@@ -1,7 +1,5 @@
 {
- "common": {
-   "save": {
-    "dafg": 123
-   }
+ "group1": {
+  "nest": "str"
  }
 }

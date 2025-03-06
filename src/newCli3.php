@@ -43,6 +43,23 @@ class newCli3
     public function runProgram()
     {
 
+
+/*
+        $d[0] = ["name" => "lemons" , "value" => 200 ,'comparison' =>'deleted'];
+        $d[1] = ["name" => "lemons" ,"value" => 400 , 'comparison' =>'added'];
+        $d[2] = ["name" => "apples" , "value" => 100 ,'comparison' =>'deleted'];
+
+        $d[3] = ["name" => "grapes" , "value" => 250 ,'comparison' =>'deleted'];
+        $d[4] = ["name" => "grapes" , "value" => 670 ,'comparison' =>'added'];
+        $d[5] = ["name" => "apples" , "value" => 900 ,'comparison' =>'added'];
+
+
+      print_r($d);
+     $res  = $this->sortTreeByComparison($d);
+
+      print_r($d);
+     return [];
+*/
         $filesPath = [];
 
         foreach ($this->params as $param) {
@@ -67,8 +84,68 @@ class newCli3
        // print_r($this->file02);
 
        $result = $this->diffTree();
-        //  print_r($result);
-        $this->formater->formatData($result);
+      // ECHO "ДИФ:\n";
+
+       //$d = $result['childs'];
+      // print_r($result);
+
+       $sortResult = $this->sortTreeByComparison($result);
+
+
+     //   ECHO "ВЫВОД НА ПЕЧАТЬ:\n";
+        $this->formater->formatData($sortResult);
+    }
+
+
+    public function sortTreeByComparison(&$node) {
+        //Сортирует Дифф ( файл после сравнения.
+        //1 По алфавиту
+        // Сначала -(deleted), затем +(added)
+
+        if (!is_array($node)) {
+            return $node;
+        }
+
+       $childs = array_map(function ($item) {
+           return $this->sortTreeByComparison($item);
+       },$node);
+
+        if ($this->treeService->isDirectory($node)) {
+
+
+            $arrs = $childs['childs'];
+            //print_r($arrs);
+
+
+            usort($arrs, function ($a, $b) {
+
+                if ($a['name'] > $b['name']) {
+                    return 1;
+                } elseif ($a['name'] < $b['name']) {
+                    return -1;
+                } else {
+
+                    if ($a['comparison'] === 'deleted' && $b['comparison'] === 'added') {
+                        return -1;
+                    } elseif ($b['comparison'] === 'deleted' && $a['comparison'] === 'added') {
+                        return 1;
+                    } else
+                        return 0;
+
+
+                }
+
+
+            });
+
+            $childs['childs'] = $arrs;
+
+        }
+
+
+        return $childs;
+
+
     }
 
 
@@ -165,9 +242,6 @@ class newCli3
                 }
 
 
-
-
-
             }
 
         }
@@ -194,14 +268,22 @@ class newCli3
 
     }
 
+
     public function newNodesFrom2File(array $node, array $nodeNames)
     {
         $file2 = $this->file02;
+
         $acc = [];
         $result = $this->iterateToCheckNewFiles($node, $nodeNames, $file2, $acc );
+
+     //   echo "ТУТ ДОЛЖНЫ БЫТЬ ТОЛЬКО НОВЫЙЕ НОДЫ.START\n ";
+
+      //  print_r($result);
+       // echo "ТУТ ДОЛЖНЫ БЫТЬ ТОЛЬКО НОВЫЙЕ НОДЫ.КОНЕЦT\n ";
         return $acc;
 
     }
+
 
     public function iterateToCheckNewFiles(
         array $node,
@@ -235,6 +317,9 @@ class newCli3
 
     public function isNodesInTheSameFolder($item1, $item2)
     {
+
+
+
         //item1 - корневая директория
         if (!
             ( $this->treeService->isFile($item1) || $this->treeService->isDirectory($item1)) &&
@@ -246,7 +331,13 @@ class newCli3
 
         unset($path2[count($path2) - 1]);
 
+
         if ($path1 === $path2) {
+          //  echo "ПАПКИ ИЛИ  ФАЙЛЫ СОВПАЛИ\n";
+          //  print_r($path1);
+          //  print_r($path2);
+
+
             return true;
         }
 
@@ -269,6 +360,7 @@ class newCli3
 
     public function findDirectory($node, array &$acc, $file2 = null)
     {
+        //ищем node директорию во втором файле
 
         if ($file2 === null) {
             $file2 = $this->file02;
@@ -292,8 +384,39 @@ class newCli3
 
                 if ($result === true) {
                     $acc['comparison'] = 'matched';
+                  //  if($node['name']==='common' && $item['name']==='common') {
+                  //      //print_r($node);
+//     echo "МЫ НАШЛИИ КОММОНОЫ2\n";
+                   //     print_r($acc);
+                 //   }
+
+
                 } else {
-                    $acc['comparison'] = 'deleted';
+                    //if($node['name']==='common' && $item['name']==='common') {
+                        //print_r($node);
+
+                     //   echo "(((((МЫ НАШЛИИ КОММОНОЫ2 DELETED5\n";
+                        //print_r($acc);
+                   // }
+
+                  //  echo "*******НАЧАЛО DELETE5\n";
+                 //   echo "node name: ". $node['name'] ."\n";
+                  //  echo "NODE:\n";
+                   // print_r($node);
+                  //  echo "ITEM:\n";
+                 //  echo "item name: ". $item['name'] ."\n";
+                 //  print_r($item);
+
+
+                   // $acc['comparison'] = 'deleted5';
+
+                  //  echo "это ACC : \n";
+                  //  print_r($acc);
+
+                 //   echo "*******ОКОНЧАНИЕ DELETE5\n";
+
+
+
                 }
             }
 
@@ -357,7 +480,7 @@ class newCli3
     {
         $result = false;
 
-          //echo "ПРОВЕРЯЕМ ДВЕ ДИРЕКТОРИИ.\n";
+        //echo "ПРОВЕРЯЕМ ДВЕ ДИРЕКТОРИИ.\n";
          // print_r($item1);
          // print_r($item2);
 
@@ -371,6 +494,18 @@ class newCli3
         ) {
             $result = true;
         }
+
+        if($item1['name']==='common' && $item2['name']==='common'){
+          /*
+            ECHO "МЫ НАШЛИИ КОММОНОЫ\n";
+            if ($result === true) {
+                ECHO "результат true\n";
+            }if ($result === false) {
+                ECHO "результат false\n";
+            }*/
+        }
+
+
         return $result;
     }
 
@@ -435,6 +570,9 @@ class newCli3
         ksort($childs, 3);
         return $childs;
     }
+
+
+
 
     public function normalizeArray($node)
     {
