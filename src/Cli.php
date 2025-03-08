@@ -9,6 +9,7 @@ use PHPUnit\Framework\Error;
 use Symfony\Component\Yaml\Yaml;
 use Hexlet\Code\Formaters\DiffFormat;
 use Hexlet\Code\Formaters\PlainFormat;
+use Hexlet\Code\Formaters\JsonFormat;
 use Illuminate\Support\Collection;
 use Hexlet\Code\FileType;
 use Hexlet\Code\TreeService;
@@ -24,13 +25,14 @@ class Cli
     public DiffFormat $formater;
     public TreeService $treeService;
     public PlainFormat $plainFormater;
-
+    public JsonFormat $jsonFormater;
     public function __construct(array|null $params = [])
     {
         $this->params = array_values($params);
         $this->treeService = new TreeService();
         $this->formater = new DiffFormat();
         $this->plainFormater = new PlainFormat();
+        $this->jsonFormater = new JsonFormat();
     }
 
     public static function cli($params)
@@ -41,6 +43,7 @@ class Cli
 
     public function runProgram()
     {
+
 
         $filesPath = [];
         $format = "diff";
@@ -57,6 +60,8 @@ class Cli
                 if ($this->params[$i] === "--format") {
                     if ($this->params[$i + 1] === "plain") {
                         $format = "plain";
+                    } elseif ($this->params[$i + 1] === "json") {
+                            $format = "json";
                     }
                     $i += 1;
                 } else {
@@ -66,6 +71,7 @@ class Cli
         }
 
         $result = $this->genDiff($filesPath[0], $filesPath[1], $format);
+        //echo "Получен результат :\n";
         echo $result;
     }
 
@@ -82,11 +88,17 @@ class Cli
         $result = $this->diffTree();
         $sortResult = $this->sortTreeByComparison($result);
 
+
+        $toPrintResult = '';
         if ($format === "diff") {
-            $this->formater->formatData($sortResult);
+            $toPrintResult = $this->formater->formatData($sortResult);
         } elseif ($format === "plain") {
-            $this->plainFormater->formatPlain($sortResult);
+            $toPrintResult = $this->plainFormater->formatPlain($sortResult);
+        } elseif ($format === "json") {
+            $toPrintResult = $this->jsonFormater->formatJson($sortResult);
         }
+
+        return $toPrintResult;
     }
 
     public function sortTreeByComparison(&$node)

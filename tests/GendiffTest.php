@@ -20,8 +20,8 @@ class GendiffTest extends TestCase
     {
 
         $cli = new Cli();
-        /*
-        $filePathExpected = './tests/fixtures/test01Expected.txt';
+
+        $filePathExpected = './tests/fixtures/test01Expected.json';
 
         $file01 = './tests/fixtures/json1Test1.json';
         $file02 = './tests/fixtures/json2Test1.json';
@@ -31,15 +31,15 @@ class GendiffTest extends TestCase
             $content = fread($file, filesize($filePathExpected)); // Читаем содержимое файла
             fclose($file); // Закрываем файл
         } else {
-            echo "Невозможно открыть файл";
+            echo "Невозможно открыть файл " . $filePathExpected . "\n";
             exit;
         }
 
         $expected = file_get_contents($filePathExpected);
-        $result = $cli->gendiff($file01, $file02, "diff");
+        $result = $cli->gendiff($file01, $file02, "json");
 
-        $this->assertEqualsIgnoreLineEndings($expected,  $result);
-        */
-        $this->assertEquals(true, true);
+       // $this->assertEqualsIgnoreLineEndings($expected,  $result);
+
+        $this->assertEquals($expected, $result);
     }
 }
