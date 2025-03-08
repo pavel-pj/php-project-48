@@ -22,9 +22,6 @@ class PlainFormat
         $result = $this->plainDiff($flatArray);
         $resultPrint = implode("\n", $result);
 
-        echo "WE ARE HERE\n";
-        print_r($result);
-
         return $resultPrint;
     }
 
