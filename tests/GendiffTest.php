@@ -7,18 +7,8 @@ use Hexlet\Code\Cli;
 
 class GendiffTest extends TestCase
 {
-    public function testParse()
-    {
-        $cli = new Cli();
-
-        //$this->assertEquals($expected, $fileData);
-
-        $this->assertEquals(1, 1);
-    }
-
     public function testGendiff(): void
     {
-
         $cli = new Cli();
 
         $filePathExpected = './tests/fixtures/test01Expected.json';
@@ -37,8 +27,6 @@ class GendiffTest extends TestCase
 
         $expected = file_get_contents($filePathExpected);
         $result = $cli->gendiff($file01, $file02, "json");
-
-       // $this->assertEqualsIgnoreLineEndings($expected,  $result);
 
         $this->assertEquals($expected, $result);
     }
