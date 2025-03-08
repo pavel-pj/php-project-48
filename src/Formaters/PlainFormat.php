@@ -21,9 +21,7 @@ class PlainFormat
         $flatArray = $this->flat($data['childs']);
         $result = $this->plainDiff($flatArray);
         $resultPrint = implode("\n", $result);
-
-
-        echo "\n\n" . $resultPrint . "\n\n";
+        return $resultPrint;
     }
 
     public function plainDiff(array $data)

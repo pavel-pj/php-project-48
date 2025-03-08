@@ -11,7 +11,8 @@ if (file_exists($autoloadPath1)) {
 }
 
 use Hexlet\Code\Cli;
-
+use PHPUnit\Runner\Version as PHPUnitVersion;
+ 
  $cli = Cli::cli($argv);
  
  try {

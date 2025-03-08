@@ -19,7 +19,7 @@ class DiffFormat
     {
         $data = $data['childs'];
         $result = $this->createList($data);
-        echo  $result;
+        return $result;
     }
 
     public function createList(array $data): string

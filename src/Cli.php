@@ -65,7 +65,8 @@ class Cli
             }
         }
 
-        $this->genDiff($filesPath[0], $filesPath[1], $format);
+        $result = $this->genDiff($filesPath[0], $filesPath[1], $format);
+        echo $result;
     }
 
     public function genDiff(string $filePath1, string $filePath2, $format)
