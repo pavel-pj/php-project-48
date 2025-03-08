@@ -8,37 +8,17 @@ class TreeService
 {
     public function isFile($node): bool
     {
-       if (!is_array($node)) {
-           return false;
-       }
-        /*
-       echo "\n*********ПРОВЕРКА ФАЙЛА\n";
-       echo "Входящий узел:\n";
-       if (is_array($node)) {
-           echo "узел - массив\n";
-           print_r($node);
-       } else {
-           echo "Узел НЕ МАССИВ\n";
-           echo $node;
-       }
-        */
+        if (!is_array($node)) {
+            return false;
+        }
 
-       if (array_key_exists('type',$node)) {
-           /*
-            echo "Это ВСЕ ТАКИ УЗЕЛ, ЕСТЬ type\n";
-            echo "сам узел\n";
-            print_r($node);
-           echo "значение node Type = \n";
-            echo $node['type']."\n";
-          // echo "сравниваеммое :\n";
-          // echo FileType::File->value ."\n";*/
-           if ($node['type'] === FileType::File->value) {
-              // echo "ДА, ЭТО ФАЙЛ!\n";
-               return true;
-           }
-       }
 
-       return false;
+        if (array_key_exists('type', $node)) {
+            if ($node['type'] === FileType::File->value) {
+                return true;
+            }
+        }
+        return false;
     }
     public function isDirectory($node): bool
     {
@@ -46,13 +26,27 @@ class TreeService
             return false;
         }
 
-        if (array_key_exists('type',$node) &&
-            $node['type'] === FileType::Directory->value) {
-                return true;
-         }
-
+        if (
+            array_key_exists('type', $node) &&
+            $node['type'] === FileType::Directory->value
+        ) {
+            return true;
+        }
         return false;
     }
 
 
+    //Проверяем 2 узла по type,name,path.
+    public function isNodeFound(array $item1, array $item2): bool
+    {
+        $result = false;
+
+        if (
+            $item1['name'] === $item2['name'] &&
+            $item1['path'] === $item2['path']
+        ) {
+            $result = true;
+        }
+        return $result;
+    }
 }

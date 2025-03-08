@@ -1,17 +1,13 @@
 <?php
 
-namespace Hexlet\Code;
+namespace Hexlet\Code\Formaters;
 
 use Hexlet\Code\FileType;
 use Hexlet\Code\TreeService;
 use Error;
 
-class Format
+class DiffFormat
 {
-    public const SYMBOL = " ";
-    public const FOLDER_INDENT = 4;
-    public const FILE_INDENT = 2;
-
     public TreeService $treeService;
 
     public function __construct()
@@ -23,7 +19,7 @@ class Format
     {
         $data = $data['childs'];
         $result = $this->createList($data);
-        echo "\n\n`{$result}\n\n";
+        echo  $result;
     }
 
     public function createList(array $data): string
