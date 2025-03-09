@@ -1,4 +1,4 @@
-ame: test-and-lint
+name: test-and-lint
 run-name: test and lint
 on: [push]
 jobs:
