@@ -2,12 +2,18 @@
     "name": "hexlet/code",
     "description": "Project-48",
     "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "Hexlet\\Code\\": "src/"
-        }
+  "bin": [
+    "bin/gendiff",
+    "bin/test"
+  ],
+  "autoload": {
+    "files": [
+      "src/Differ.php",
+      "src/Parsers.php"
 
-    },
+    ]
+  },
+
     "authors": [
         {
             "name": "pavel",
