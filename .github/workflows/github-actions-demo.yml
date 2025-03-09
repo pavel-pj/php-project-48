@@ -1,4 +1,4 @@
-name: test-and-lint
+ame: test-and-lint
 run-name: test and lint
 on: [push]
 jobs:
@@ -19,15 +19,17 @@ jobs:
       - name: Install
         # Install project
         run: make install
+      - name: Run linter
+        # Run Linter
         run: make lint
         # Publish code coverage on Code Climate
         # https://github.com/paambaati/codeclimate-action
-         - name: Run test & publish code coverage
-        uses: paambaati/codeclimate-action@v9.0.0
+      - name: Run test & publish code coverage
+        uses: paambaati/codeclimate-action@v2.6.0
         # Add Code Climate secret key
         env:
-           CC_TEST_REPORTER_ID: ${{ secrets.KEY_CODECLIMATE }}
+          CC_TEST_REPORTER_ID: ${{ secrets.KEY_CODECLIMATE }}
         with:
-           coverageCommand: make test-coverage
+          coverageCommand: make test-coverage
           coverageLocations: ${{github.workplace}}/build/logs/clover.xml:clover
           debug: true
