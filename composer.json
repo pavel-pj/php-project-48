@@ -3,13 +3,15 @@
     "description": "Project-48",
     "license": "MIT",
   "bin": [
-    "bin/gendiff",
-    "bin/test"
+    "bin/gendiff"
   ],
   "autoload": {
     "files": [
       "src/Differ.php",
-      "src/Parsers.php"
+      "src/Parsers.php",
+      "src/Compare.php",
+      "src/Formatter.php",
+      "src/Formatters/Stylish.php"
 
     ]
   },
