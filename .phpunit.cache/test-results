@@ -1,1 +1,1 @@
-{"version":1,"defects":{"mainTest::testFirst":8,"test\\MainTest::testFirst":8},"times":{"Hexlet\\Code\\Tests\\GendiffTest::testGendiff":0.007,"mainTest::testFirst":0.002,"test\\MainTest::testFirst":0.005}}
+{"version":1,"defects":{"mainTest::testFirst":8,"test\\MainTest::testFirst":8},"times":{"Hexlet\\Code\\Tests\\GendiffTest::testGendiff":0.007,"mainTest::testFirst":0.002,"test\\MainTest::testFirst":0.006}}

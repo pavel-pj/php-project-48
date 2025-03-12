@@ -3,7 +3,6 @@
 namespace Differ\Formatter;
 
 use Differ\Formatters\Stylish;
-
 use Exception;
 
 /**
