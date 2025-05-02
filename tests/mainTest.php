@@ -11,11 +11,14 @@ final class MainTest extends TestCase
     public function testFirst()
     {
 
-        //$file1 = genDiff('tests/fixtures/file1.json', 'tests/fixtures/file2.json');
+        $gendiff = genDiff('tests/fixtures/file1.json', 'tests/fixtures/file2.json');
 
-        //$result = gettype($file1);
-       // $expected = gettype([]);
+        $fileName = 'tests/fixtures/result.txt';
+        $expected = file_get_contents($fileName);
 
-        $this->assertEquals(1, 1);
+        if ($fileName === false) {
+            throw new \Exception('Не удалось открыть файл для чтения.');
+        }
+        $this->assertEquals($expected, $gendiff);
     }
 }

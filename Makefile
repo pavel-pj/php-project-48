@@ -10,6 +10,12 @@ lint:
 	composer exec --verbose phpcs -- --standard=PSR12 src tests
 gendiff:
 	./bin/gendiff
+diff:
+	bin/gendiff tests/fixtures/file1.json tests/fixtures/file2.json
+diff2:
+	bin/gendiff --format plain tests/fixtures/file1.json tests/fixtures/file2.json
+diff3:
+	bin/gendiff --format json tests/fixtures/file1.json tests/fixtures/file2.json
 test:
 	composer exec --verbose phpunit tests
 test-coverage:

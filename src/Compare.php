@@ -18,9 +18,10 @@ function compareTrees(array $file1, array $file2)
         $keyExist2 = key_exists($key, $file2);
 
         if ($keyExist1 && !$keyExist2) {
+           // echo "Новый Ключ : ". $key . "\n";
             return [...$carry , putDiffMark($key, $file1[$key], -1)];
         }
-        if (!$keyExist1 && !$keyExist2) {
+        if (!$keyExist1 && $keyExist2) {
             return [...$carry , putDiffMark($key, $file2[$key], 1)];
         }
 

@@ -6,7 +6,7 @@ use function Differ\Parsers\getData;
 use function Differ\Compare\compareTrees;
 use function Differ\Formatter\formatResult;
 
-const DEFAULT_FORMAT = "main";
+const DEFAULT_FORMAT = "stylish";
 
 function genDiff(string $filePath1, string $filePath2, string $format = DEFAULT_FORMAT)
 {
