@@ -2,15 +2,16 @@
 
 namespace Differ\Compare;
 
-function putDiffMark(mixed $key, mixed $value, int $mark, bool $isUpdated = null, mixed $newValue = null)
+function putDiffMark(mixed $key, mixed $value, int $mark, bool $isUpdated = null, mixed $newValue = null):array
 {
     return ['key' => $key, 'value' => $value, 'mark' => $mark, 'isUpdated' => $isUpdated, 'newValue' => $newValue];
 }
 
-function compareTrees(array $file1, array $file2)
+function compareTrees(array $file1, array $file2): array
 {
-    $keys = array_unique(array_merge(array_keys($file1), array_keys($file2)));
-    $keysSorted = sort($keys);
+    $originalKeys = array_unique(array_merge(array_keys($file1), array_keys($file2)));
+    $keys = $originalKeys; sort($keys);
+    sort($keys);
 
     $result = array_reduce($keys, function ($carry, $key) use ($file1, $file2) {
 

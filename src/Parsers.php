@@ -38,11 +38,7 @@ function parceFile(string $file, string $filePath): array
 
 function jsonParser(string $file, string $path): array
 {
-    try {
-        return json_decode($file, true, JSON_PRETTY_PRINT);
-    } catch (Exception $e) {
-        throw new Exception("Cannot decode Json file {$path} : {$e->getMessage()}");
-    }
+    return json_decode($file, true, JSON_PRETTY_PRINT);
 }
 
 function yamlParser(string $file, string $filePath): array
