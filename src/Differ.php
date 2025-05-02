@@ -8,7 +8,7 @@ use function Differ\Formatter\formatResult;
 
 const DEFAULT_FORMAT = "stylish";
 
-function genDiff(string $filePath1, string $filePath2, string $format = DEFAULT_FORMAT): string
+function genDiff(string $filePath1, string $filePath2, string $format = DEFAULT_FORMAT): string|false
 {
     $file1 = getData($filePath1);
     $file2 = getData($filePath2);
