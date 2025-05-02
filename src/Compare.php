@@ -2,6 +2,8 @@
 
 namespace Differ\Compare;
 
+use function Functional\sort;
+
 function putDiffMark(mixed $key, mixed $value, int $mark, bool $isUpdated = null, mixed $newValue = null): array
 {
     return ['key' => $key, 'value' => $value, 'mark' => $mark, 'isUpdated' => $isUpdated, 'newValue' => $newValue];
@@ -10,9 +12,7 @@ function putDiffMark(mixed $key, mixed $value, int $mark, bool $isUpdated = null
 function compareTrees(array $file1, array $file2): array
 {
     $originalKeys = array_unique(array_merge(array_keys($file1), array_keys($file2)));
-    $keys = array_slice($originalKeys, 0);
-    sort($keys);
-
+    $keys = sort($originalKeys, fn ($left, $right) => strcmp($left, $right));
     $result = array_reduce($keys, function ($carry, $key) use ($file1, $file2) {
 
         $keyExist1 = key_exists($key, $file1);
