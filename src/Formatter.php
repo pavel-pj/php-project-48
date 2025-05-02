@@ -10,7 +10,7 @@ use Exception;
 /**
  * @throws Exception
  */
-function formatResult(array $diff, string $format): string
+function formatResult(array $diff, string $format): string|false
 {
 
     return match ($format) {

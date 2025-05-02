@@ -18,8 +18,8 @@ function getFileData(string $filePath): array
     }
 
     $result = file_get_contents($filePath);
-    if (!$result) {
-        throw new  Exception("File could not be read: $filePath");
+    if ($result === false) {
+         throw new  Exception("File could not be read: $filePath");
     }
 
     return parceFile($result, $filePath);
